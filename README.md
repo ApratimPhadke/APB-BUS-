@@ -125,7 +125,7 @@ The design maps cleanly to on-board peripherals:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/ApratimPhadke/your-repo-name.git
+git clone https://github.com/ApratimPhadke/APB-BUS-.git
 ```
 
 ### 2. Run Simulation (Icarus Verilog)
