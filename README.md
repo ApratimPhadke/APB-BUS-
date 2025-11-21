@@ -40,3 +40,73 @@ graph TD
     
     UART_Core -->|RS232| USB_Port[USB-UART Port]
     I2C_Core -->|SDA/SCL| Sensors[On-board Sensors]
+## 📝 Register Map
+
+Communication is handled via 32-bit memory-mapped registers.
+
+### 📡 UART Peripheral
+| Offset | Name | R/W | Description |
+| :--- | :--- | :--- | :--- |
+| `0x00` | **CONTROL** | RW | Configuration bits |
+| `0x04` | **STATUS** | RO | `[0]` Busy, `[1]` TX Done, `[2]` RX Valid, `[3]` Error |
+| `0x08` | **TX_DATA** | RW | Write byte to transmit |
+| `0x0C` | **RX_DATA** | RO | Read received byte |
+
+### 🔌 I2C Peripheral
+| Offset | Name | R/W | Description |
+| :--- | :--- | :--- | :--- |
+| `0x00` | **CONTROL** | RW | `[0]` Start, `[1]` Stop, `[2]` Read, `[3]` Write |
+| `0x04` | **STATUS** | RO | `[0]` Busy, `[1]` Done, `[2]` ACK Error |
+| `0x08` | **ADDR** | RW | 7-bit Slave Address |
+| `0x0C` | **TX_DATA** | RW | Byte to write to slave |
+| `0x10` | **RX_DATA** | RO | Byte read from slave |
+
+---
+
+## 🛠️ Verification & Testing
+
+### Simulation
+A complete testbench (`tb_top_level.v`) is provided. It instantiates the top level, generates a 100MHz clock, and simulates user inputs (Switches/Buttons) to trigger transactions.
+
+* **Waveform Dump:** Generates `tb_top_level.vcd` for viewing in GTKWave.
+* **Self-Checking:** Monitors UART TX lines to verify data integrity.
+
+### Hardware Validation (Nexys 4)
+The design maps to the Nexys 4 board peripherals:
+
+* **LEDs `[7:0]`**: Indicate Status (Heartbeat, UART IRQ, I2C IRQ, Test Pass).
+* **Switches `[1:0]`**: Select Test Mode (`SW[0]`=UART, `SW[1]`=I2C).
+* **Buttons**:
+    * `BTN[0]`: Send next UART Character.
+    * `BTN[2]`: System Reset.
+
+---
+
+## 📂 File Structure
+
+* `apb_bus.v`: **The Core.** Contains all APB slaves, UART/I2C logic, and Bridges.
+* `top_level_fpga.v`: **The Glue.** Maps the APB system to physical FPGA pins and contains the Test FSM.
+* `tb_top_level.v`: **The Proof.** Simulation testbench.
+* `top_level_fpga_netlist.v`: **The Synthesis.** Yosys-generated gate-level netlist.
+
+---
+
+## 🚀 Getting Started
+
+**1. Clone the repo:**
+```bash
+git clone [https://github.com/ApratimPhadke/your-repo-name.git](https://github.com/ApratimPhadke/your-repo-name.git)
+
+**2. Simulate (using Icarus Verilog):**
+```bash
+iverilog -o testbench tb_top_level.v top_level_fpga.v apb_bus.v
+vvp testbench
+gtkwave tb_top_level.vcd
+**3. Synthesize:**
+ Import the source files into Vivado or use Yosys with the provided netlist for integration.
+
+👤** Author**
+**Apratim Phadke** GitHub | LinkedIn
+
+Built with Verilog, Coffee, and a love for Digital Design.
+
